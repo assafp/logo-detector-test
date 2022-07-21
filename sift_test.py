@@ -22,8 +22,9 @@ matchesMask = [[0,0] for i in range(len(matches))]
 good = []
 # ratio test as per Lowe's paper
 for i,(m,n) in enumerate(matches):
-    matchesMask[i]=[1,0]
-    good.append([m])
+    if m.distance < 0.7*n.distance:
+        matchesMask[i]=[1,0]
+        good.append([m])
 
 draw_params = dict(matchColor = (0,255,0),
                    singlePointColor = (255,0,0),
@@ -53,7 +54,7 @@ scene_points = cv.perspectiveTransform(np.float32([(0, 0), (0, shape[0] - 1),
 
 rect = cv.minAreaRect(scene_points)
 
-import pdb; pdb.set_trace()
+# import pdb; pdb.set_trace()
 box = cv.boxPoints(rect)
 box = np.int0(box)
 
