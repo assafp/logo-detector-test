@@ -16,6 +16,7 @@ def getFeatures(img):
 
 
 def detectFeatures(img, train_features):
+    import pdb; pdb.set_trace()
     train_kps, train_descs, shape = train_features
     # get features from input image
     kps, descs, _ = getFeatures(img)
@@ -36,9 +37,14 @@ def detectFeatures(img, train_features):
             if m.distance < 0.8 * n.distance:
                 good.append([m])
 
+        import pdb; pdb.set_trace()
+
+        
         # stop if we didn't find enough matching keypoints
         if len(good) < 0.1 * len(train_kps):
             return None
+
+        import pdb; pdb.set_trace()
 
         # estimate a transformation matrix which maps keypoints from train image coordinates to sample image
         src_pts = np.float32([train_kps[m[0].queryIdx].pt for m in good
@@ -48,15 +54,18 @@ def detectFeatures(img, train_features):
 
         m, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
 
+        import pdb; pdb.set_trace()
+
         if m is not None:
             # apply perspective transform to train image corners to get a bounding box coordinates on a sample image
             scene_points = cv2.perspectiveTransform(np.float32([(0, 0), (0, shape[0] - 1),
                                                                 (shape[1] - 1, shape[0] - 1),
                                                                 (shape[1] - 1, 0)]).reshape(-1, 1, 2), m)
+            import pdb; pdb.set_trace()
             rect = cv2.minAreaRect(scene_points)
             # check resulting rect ratio knowing we have almost square train image
-            if rect[1][1] > 0 and 0.8 < (rect[1][0] / rect[1][1]) < 1.2:
+            if rect[1][1] > 0:
                 return rect
-    except:
-        pass
+    except Exception as e:
+        import pdb; pdb.set_trace()
     return None
